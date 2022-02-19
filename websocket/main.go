@@ -31,7 +31,6 @@ func main() {
 }
 
 func socketHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("hi!")
 	upgrader.CheckOrigin = func(r *http.Request) bool {
 		return true
 	}
