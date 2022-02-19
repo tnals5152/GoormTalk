@@ -59,5 +59,4 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
-	log.Println(conn)
 }
