@@ -55,7 +55,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		err = conn.WriteJSON(&test)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 
 	}
