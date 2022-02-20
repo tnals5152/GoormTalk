@@ -46,6 +46,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer conn.Close()
+	//소켓 연결 됐을 시 topic 확인 후 생성 코드 필요
 	go config.KafkaProduce()
 	time.Sleep(1 * time.Second)
 	go config.KafkaConsumer()
