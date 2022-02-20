@@ -4,8 +4,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/joho/godotenv"
+
+	"goorm_socket/config"
 )
 
 const socketBufferSize = 1024
@@ -24,6 +28,8 @@ type testJson struct {
 //javascript console에서 w = new WebSocket("ws://15.164.220.65:8080/ws") 시 실행
 //w.send("message")로 테스트
 func main() {
+	err := godotenv.Load("../.env")
+	log.Println(err)
 	http.Handle("/", http.FileServer(http.Dir("static")))
 	http.HandleFunc("/ws", socketHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
@@ -40,8 +46,11 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer conn.Close()
+	go config.KafkaProduce()
+	time.Sleep(1 * time.Second)
+	go config.KafkaConsumer()
 	for {
-		messageType, message, err := conn.ReadMessage()
+		messageType, message, err := conn.ReadMessage() //사용자에게만 보낼 때 사용
 		if err != nil {
 			log.Println("err", err)
 		}
