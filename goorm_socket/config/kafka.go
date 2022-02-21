@@ -75,3 +75,19 @@ func (producer *Producer) Send(message string) {
 	fmt.Println(offset)
 
 }
+
+func MakeTopic(userID string) {
+	fmt.Println("??")
+	brokerAddrs := []string{"54.180.85.30:9092"}
+	config := sarama.NewConfig()
+	config.Version = sarama.V2_1_0_0
+	//연결에러
+	admin, err := sarama.NewClusterAdmin(brokerAddrs, config)
+	fmt.Println(err)
+	defer admin.Close()
+	err = admin.CreateTopic(userID, &sarama.TopicDetail{
+		NumPartitions:     1,
+		ReplicationFactor: 1,
+	}, false)
+	fmt.Println(err)
+}

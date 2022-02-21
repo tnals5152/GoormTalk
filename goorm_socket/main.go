@@ -36,6 +36,7 @@ func main() {
 
 }
 
+//url parameter -> r.URL.Query()
 func socketHandler(w http.ResponseWriter, r *http.Request) {
 	upgrader.CheckOrigin = func(r *http.Request) bool {
 		return true
@@ -46,6 +47,15 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer conn.Close()
+	params := r.URL.Query()
+	userID := params.Get("userid")
+	if userID == "" {
+		fmt.Println("websocket url error")
+		return
+	}
+	//토픽 생성하기
+	fmt.Println(userID)
+	config.MakeTopic(userID)
 	//소켓 연결 됐을 시 topic 확인 후 생성 코드 필요
 	go config.KafkaProduce()
 	time.Sleep(1 * time.Second)
