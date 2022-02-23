@@ -19,10 +19,19 @@ type Consumer struct {
 	PartitionConsumer [2]sarama.PartitionConsumer
 }
 
+var KAFKA string
+
+func KafkaSetting() bool {
+	KAFKA = fmt.Sprintf("%s:%s", os.Getenv("KAFKA_IP"), os.Getenv("KAFKA_PORT"))
+	if KAFKA == "" {
+		return false
+	}
+	return true
+}
 func KafkaConsumer() {
 
 	consumer, err := sarama.NewConsumer([]string{
-		"54.180.80.24:9092",
+		KAFKA,
 	}, nil)
 	fmt.Println(2, err)
 	c := Consumer{Consumer: consumer}
@@ -58,7 +67,7 @@ func KafkaProduce() {
 	config.Producer.RequiredAcks = sarama.WaitForAll
 	config.Producer.Return.Successes = true
 	c, err := sarama.NewSyncProducer([]string{
-		"54.180.80.24:9092",
+		KAFKA,
 	}, config)
 	fmt.Println(err)
 	p := &Producer{ChatProducer: c}
@@ -78,7 +87,7 @@ func (producer *Producer) Send(message string) {
 }
 
 func MakeTopic(userID string) {
-	broker := sarama.NewBroker("172.31.44.168:9092")
+	broker := sarama.NewBroker(KAFKA)
 
 	config := sarama.NewConfig()
 	config.Version = sarama.V2_8_0_0

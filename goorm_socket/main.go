@@ -29,6 +29,9 @@ type testJson struct {
 //w.send("message")로 테스트
 func main() {
 	err := godotenv.Load("../.env")
+	if !config.KafkaSetting() {
+		panic("kafka setting error")
+	}
 	log.Println(err)
 	http.Handle("/", http.FileServer(http.Dir("static")))
 	http.HandleFunc("/ws", socketHandler)
