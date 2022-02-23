@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"time"
@@ -21,7 +22,7 @@ type Consumer struct {
 func KafkaConsumer() {
 
 	consumer, err := sarama.NewConsumer([]string{
-		"54.180.85.30:9092",
+		"54.180.80.24:9092",
 	}, nil)
 	fmt.Println(2, err)
 	c := Consumer{Consumer: consumer}
@@ -57,7 +58,7 @@ func KafkaProduce() {
 	config.Producer.RequiredAcks = sarama.WaitForAll
 	config.Producer.Return.Successes = true
 	c, err := sarama.NewSyncProducer([]string{
-		"54.180.85.30:9092",
+		"54.180.80.24:9092",
 	}, config)
 	fmt.Println(err)
 	p := &Producer{ChatProducer: c}
@@ -71,23 +72,35 @@ func (producer *Producer) Send(message string) {
 		Value: sarama.StringEncoder(message),
 	})
 	fmt.Println(err)
-	fmt.Println(partition, "????")
+	fmt.Println(partition)
 	fmt.Println(offset)
 
 }
 
 func MakeTopic(userID string) {
-	fmt.Println("??")
-	brokerAddrs := []string{"54.180.85.30:9092"}
+	broker := sarama.NewBroker("172.31.44.168:9092")
+
 	config := sarama.NewConfig()
-	config.Version = sarama.V2_1_0_0
-	//연결에러
-	admin, err := sarama.NewClusterAdmin(brokerAddrs, config)
-	fmt.Println(err)
-	defer admin.Close()
-	err = admin.CreateTopic(userID, &sarama.TopicDetail{
-		NumPartitions:     1,
-		ReplicationFactor: 1,
-	}, false)
-	fmt.Println(err)
+	config.Version = sarama.V2_8_0_0
+	err := broker.Open(config)
+
+	connected, err := broker.Connected()
+	if !connected {
+		log.Println(err)
+	}
+
+	request := sarama.CreateTopicsRequest{
+		Timeout: time.Second * 10,
+		TopicDetails: map[string]*sarama.TopicDetail{
+			userID: &sarama.TopicDetail{
+				NumPartitions:     int32(1),
+				ReplicationFactor: int16(1),
+			},
+		},
+	}
+	response, err := broker.CreateTopics(&request)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(response)
 }
