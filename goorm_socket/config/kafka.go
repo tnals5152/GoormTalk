@@ -46,6 +46,15 @@ func ConnectBroker() {
 	Broker = broker
 }
 
+var KAFKA string
+
+func KafkaSetting() bool {
+	KAFKA = fmt.Sprintf("%s:%s", os.Getenv("KAFKA_IP"), os.Getenv("KAFKA_PORT"))
+	if KAFKA == "" {
+		return false
+	}
+	return true
+}
 func KafkaConsumer() {
 
 	consumer, err := sarama.NewConsumer([]string{
