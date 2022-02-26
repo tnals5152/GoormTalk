@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -29,14 +30,23 @@ type testJson struct {
 //w.send("message")로 테스트
 func main() {
 	err := godotenv.Load("../.env")
+	if !config.KafkaSetting() {
+		panic("kafka setting error")
+	}
 	log.Println(err)
+	producer := config.KafkaProduce()
+	config.ConnectBroker()
+	defer producer.ChatProducer.Close()
+
 	http.Handle("/", http.FileServer(http.Dir("static")))
 	http.HandleFunc("/ws", socketHandler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":"+os.Getenv("WEBSOCKET_PORT"), nil))
 
 }
 
 //url parameter -> r.URL.Query()
+//각 소켓은 하나의 유저 -> 하나의 유저는 참여하고 있는 채팅방의 메시지를 받을 수 있어야함
+//-> 채팅 ID로 topic 생성, all topic 생성 -> 유저는 참여한 채팅방 ID의 토픽을 구독
 func socketHandler(w http.ResponseWriter, r *http.Request) {
 	upgrader.CheckOrigin = func(r *http.Request) bool {
 		return true
@@ -55,9 +65,9 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	//토픽 생성하기
 	fmt.Println(userID)
-	config.MakeTopic(userID)
 	//소켓 연결 됐을 시 topic 확인 후 생성 코드 필요
-	go config.KafkaProduce()
+	config.MakeTopic(userID)
+
 	time.Sleep(1 * time.Second)
 	go config.KafkaConsumer()
 	for {
