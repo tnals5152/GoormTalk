@@ -62,6 +62,10 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 	userID := params.Get("userid")
 	if userID == "" {
 		utils.ErrorCheck(errors.New("websocket url error"))
+		conn.WriteJSON(&config.ResultJson{
+			Command: "error",
+			Value:   "userid Error",
+		})
 		return
 	}
 	//토픽 생성하기
@@ -76,6 +80,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 			log.Println("err", err)
 		}
 		fmt.Println(string(message), "    ", messageType)
+		config.ConverToFunc(string(message), "test")
 		test := testJson{
 			A: "a1",
 			B: 1,
