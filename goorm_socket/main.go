@@ -1,16 +1,17 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/joho/godotenv"
 
 	"goorm_socket/config"
+	"goorm_socket/utils"
 )
 
 const socketBufferSize = 1024
@@ -33,8 +34,8 @@ func main() {
 	if !config.KafkaSetting() {
 		panic("kafka setting error")
 	}
-	log.Println(err)
-	producer := config.KafkaProduce()
+	utils.ErrorCheck(err)
+	producer := config.KafkaProduce() //produce는 서버당 하나 생성
 	config.ConnectBroker()
 	defer producer.ChatProducer.Close()
 
@@ -53,14 +54,14 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println(err)
+		utils.ErrorCheck(err)
 		return
 	}
 	defer conn.Close()
 	params := r.URL.Query()
 	userID := params.Get("userid")
 	if userID == "" {
-		fmt.Println("websocket url error")
+		utils.ErrorCheck(errors.New("websocket url error"))
 		return
 	}
 	//토픽 생성하기
@@ -68,8 +69,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 	//소켓 연결 됐을 시 topic 확인 후 생성 코드 필요
 	config.MakeTopic(userID)
 
-	time.Sleep(1 * time.Second)
-	go config.KafkaConsumer()
+	go config.KafkaConsumer() //Consumer는 사용자당 하나 생성
 	for {
 		messageType, message, err := conn.ReadMessage() //사용자에게만 보낼 때 사용
 		if err != nil {

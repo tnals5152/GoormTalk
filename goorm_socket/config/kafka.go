@@ -25,7 +25,7 @@ var Broker *sarama.Broker
 
 func KafkaSetting() bool {
 	KAFKA = fmt.Sprintf("%s:%s", os.Getenv("KAFKA_IP"), os.Getenv("KAFKA_PORT"))
-	if KAFKA == "" {
+	if KAFKA == ":" {
 		return false
 	}
 	return true
@@ -46,15 +46,6 @@ func ConnectBroker() {
 	Broker = broker
 }
 
-var KAFKA string
-
-func KafkaSetting() bool {
-	KAFKA = fmt.Sprintf("%s:%s", os.Getenv("KAFKA_IP"), os.Getenv("KAFKA_PORT"))
-	if KAFKA == "" {
-		return false
-	}
-	return true
-}
 func KafkaConsumer() {
 
 	consumer, err := sarama.NewConsumer([]string{
@@ -72,7 +63,7 @@ func KafkaConsumer() {
 	partitions, err := consumer.Partitions(topic)
 	utils.IfErrorMakePanic(err, fmt.Sprintf("get %s topic partition", topic))
 
-	//파티션 개수는 서버에 연결된 사람 수만큼 생성...?
+	//파티션 개수는 서버에 연결된 사람 수만큼 생성...? -> 하나의 파티션에 하나의 컨슈머밖에 연결하지 못 함 -> 한사람당 하나
 	// timeSource := rand.NewSource(time.Now().UnixNano())
 	// random := rand.New(timeSource)
 
