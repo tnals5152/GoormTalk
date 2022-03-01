@@ -1,20 +1,28 @@
 package config
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+
+	"goorm_socket/utils"
+)
 
 var funcMap = map[string]interface{}{
 	"TestFunc": TestFunc,
 }
 
 type ResultJson struct {
-	Command string
+	Command string //functionName
 	Value   interface{}
 }
 
-func ConverToFunc(funcName string, value interface{}) {
-	if function, ok := funcMap[funcName]; ok {
-		function.(func(interface{}))(value)
+func ConverToFunc(jsonMessage []byte) {
+	var resultJson ResultJson
+	err := json.Unmarshal(jsonMessage, &resultJson)
+	utils.ErrorCheck(err)
 
+	if function, ok := funcMap[resultJson.Command]; ok {
+		function.(func(interface{}))(resultJson.Value)
 	}
 }
 

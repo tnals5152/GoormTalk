@@ -11,7 +11,7 @@ import (
 	"goorm_socket/utils"
 )
 
-type Producer struct {
+type ProducerStruct struct {
 	ChatProducer sarama.SyncProducer //close필요
 }
 
@@ -22,6 +22,7 @@ type Consumer struct {
 
 var KAFKA string
 var Broker *sarama.Broker
+var Producer *ProducerStruct
 
 //카프카 연결 IP세팅
 func KafkaSetting() bool {
@@ -62,17 +63,15 @@ func KafkaConsumer() {
 	//ID를 이름으로 토픽 이름이 일치하는게 있는지 확인 및 없으면 토픽 생성(for)
 
 	//해당 토픽이 가지고 있는 파티션 리스트 반환 없으면 에러(for문으로 변경 예정)
-	topic := "test"
+	topic := "2"
 	partitions, err := consumer.Partitions(topic)
 	utils.IfErrorMakePanic(err, fmt.Sprintf("get %s topic partition", topic))
 
-	//파티션 개수는 서버에 연결된 사람 수만큼 생성...? -> 하나의 파티션에 하나의 컨슈머밖에 연결하지 못 함 -> 한사람당 하나
 	// timeSource := rand.NewSource(time.Now().UnixNano())
 	// random := rand.New(timeSource)
 
 	// partition := random.Intn(len(partitions)-1) + 1
-	//파티션 구독 중인지 알 수 있는지 확인 및 알 수 있으면 사용자 없는 곳에 연결 (해당 채팅방 사람 수만큼 할 수 X <- 한 사람이 여러개 틀 수 있음)
-	partitionConsumer, err := consumer.ConsumePartition(topic, partitions[0], sarama.OffsetNewest)
+	partitionConsumer, err := consumer.ConsumePartition(topic, partitions[1], sarama.OffsetNewest)
 	utils.IfErrorMakePanic(err, fmt.Sprintf("get partition error from %s topic", topic))
 	c.PartitionConsumer = append(c.PartitionConsumer, partitionConsumer)
 
@@ -93,6 +92,7 @@ func KafkaConsumer() {
 					fmt.Println("Message   : ", string(msg.Value))
 					fmt.Println("Partition : ", msg.Partition)
 					fmt.Println("Offset    : ", msg.Offset)
+					fmt.Println("Consumer  : ", c)
 				}
 			}
 		}(v)
@@ -102,7 +102,7 @@ func KafkaConsumer() {
 
 //카프카 프로듀서 생성 함수
 //서버 하나당 하나 생성
-func KafkaProduce() *Producer {
+func KafkaProduce() *ProducerStruct {
 	config := sarama.NewConfig()
 	config.Producer.Partitioner = sarama.NewRandomPartitioner
 	config.Producer.RequiredAcks = sarama.WaitForAll
@@ -111,20 +111,24 @@ func KafkaProduce() *Producer {
 		KAFKA,
 	}, config)
 	utils.IfErrorMakePanic(err, "can not create produce")
-	producer := &Producer{ChatProducer: c}
+	producer := &ProducerStruct{ChatProducer: c}
+	Producer = producer
 	// time.Sleep(5 * time.Second)
 	// producer.Send("soomin!!")
 	return producer
 }
 
-func (producer *Producer) Send(topic string, message string, partition int32) {
+func (producer *ProducerStruct) Send(topic string, message string) {
+	producer.SendWithPartitionNumber(topic, message, 1)
+}
+
+func (producer *ProducerStruct) SendWithPartitionNumber(topic string, message string, partition int32) {
 	_, _, err := producer.ChatProducer.SendMessage(&sarama.ProducerMessage{
 		Topic:     topic,
 		Partition: partition,
 		Value:     sarama.StringEncoder(message),
 	})
 	utils.ErrorCheck(err)
-
 }
 
 //채팅방 별 토픽 생성
@@ -134,7 +138,7 @@ func MakeTopic(topic string) {
 		Timeout: time.Second * 10,
 		TopicDetails: map[string]*sarama.TopicDetail{
 			topic: &sarama.TopicDetail{
-				NumPartitions:     int32(1),
+				NumPartitions:     int32(2), //partition 0 - elasticsearch, partition 1: consumer
 				ReplicationFactor: int16(1),
 			},
 		},

@@ -72,6 +72,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(userID)
 	//소켓 연결 됐을 시 topic 확인 후 생성 코드 필요
 	config.MakeTopic(userID)
+	// config.Producer.Send(userID, "messageTest", 1)
 
 	go config.KafkaConsumer() //Consumer는 사용자당 하나 생성
 	for {
@@ -80,7 +81,8 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 			log.Println("err", err)
 		}
 		fmt.Println(string(message), "    ", messageType)
-		config.ConverToFunc(string(message), "test")
+		// config.Producer.Send("2", string(message))//topic send 테스트
+		config.ConverToFunc(message)
 		test := testJson{
 			A: "a1",
 			B: 1,
