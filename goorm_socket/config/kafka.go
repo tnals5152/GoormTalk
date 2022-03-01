@@ -23,6 +23,7 @@ type Consumer struct {
 var KAFKA string
 var Broker *sarama.Broker
 
+//카프카 연결 IP세팅
 func KafkaSetting() bool {
 	KAFKA = fmt.Sprintf("%s:%s", os.Getenv("KAFKA_IP"), os.Getenv("KAFKA_PORT"))
 	if KAFKA == ":" {
@@ -31,6 +32,7 @@ func KafkaSetting() bool {
 	return true
 }
 
+//카프카 연결 함수
 func ConnectBroker() {
 	broker := sarama.NewBroker(KAFKA)
 
@@ -46,6 +48,7 @@ func ConnectBroker() {
 	Broker = broker
 }
 
+//카프카 컨슈머 생성 함수
 func KafkaConsumer() {
 
 	consumer, err := sarama.NewConsumer([]string{
@@ -97,6 +100,7 @@ func KafkaConsumer() {
 	time.Sleep(10000 * time.Second)
 }
 
+//카프카 프로듀서 생성 함수
 //서버 하나당 하나 생성
 func KafkaProduce() *Producer {
 	config := sarama.NewConfig()
@@ -113,15 +117,17 @@ func KafkaProduce() *Producer {
 	return producer
 }
 
-func (producer *Producer) Send(topic string, message string) {
+func (producer *Producer) Send(topic string, message string, partition int32) {
 	_, _, err := producer.ChatProducer.SendMessage(&sarama.ProducerMessage{
-		Topic: topic,
-		Value: sarama.StringEncoder(message),
+		Topic:     topic,
+		Partition: partition,
+		Value:     sarama.StringEncoder(message),
 	})
 	utils.ErrorCheck(err)
 
 }
 
+//채팅방 별 토픽 생성
 func MakeTopic(topic string) {
 
 	request := sarama.CreateTopicsRequest{
@@ -134,8 +140,6 @@ func MakeTopic(topic string) {
 		},
 	}
 	response, err := Broker.CreateTopics(&request)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(response)
+	utils.ErrorCheck(err)
+	fmt.Println("response: ", response.TopicErrors)
 }
