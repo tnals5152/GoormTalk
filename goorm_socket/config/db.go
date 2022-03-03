@@ -7,18 +7,17 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 
+	"goorm_socket/models"
 	"goorm_socket/utils"
 )
 
 var GetDB *gorm.DB
 var SetDB *gorm.DB
 
-type User struct {
-	// gorm.Model
-	User_ID      uint64 `gorm:"primary_key"`
-	Username     string
-	Name         string
-	ProfileImage string
+type Test struct {
+	gorm.Model
+	id   uint64 `gorm:"colum:id; primary_key"`
+	name string `gorm:column:name`
 }
 
 //각 서버에서 실행 시 디비 연결
@@ -43,7 +42,18 @@ func ConnectDB() {
 	utils.ErrorCheck(err)
 	fmt.Println(SetDB)
 
-	// var user User
-	// GetDB.First(&user, 1)
+	var user models.User
+	GetDB.Table("User").Find(&user)
+	fmt.Println(user)
+
+	test := Test{
+		id: 1, name: "testName",
+	}
+	var tests []Test
+	// SetDB.CreateTable(&test)
+	// SetDB.Create(&test) //create object -> insert
+	SetDB.Model(&test)
+	SetDB.Find(&tests) //select all
+	fmt.Println(tests)
 
 }
