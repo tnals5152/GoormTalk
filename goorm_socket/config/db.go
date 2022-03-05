@@ -15,11 +15,11 @@ var GetDB *gorm.DB
 var SetDB *gorm.DB
 
 type Test2 struct {
-	gorm.Model
-	id         uint64 `gorm:"colum:id; primary_key"`
-	name       string `gorm:"column:name"`
-	address    string `gorm:"column:address"`
-	testString string `gorm:"column:teststring"`
+	// gorm.Model //id, create_at, update_at, delete_at이 포함되어있는 Model객체
+	//id         uint64 `gorm:"colum:id; primary_key"`
+	name       string
+	address    string
+	testString string
 }
 
 //각 서버에서 실행 시 디비 연결
@@ -49,14 +49,16 @@ func ConnectDB() {
 	fmt.Println(user)
 
 	test := Test2{
-		id: 1, name: "testName",
+		name: "testName",
 	}
 	// SetDB.CreateTable(&test)
-	SetDB.AutoMigrate(&Test2{})
+	db := SetDB.AutoMigrate(Test2{})
+	fmt.Println(db)
+	db.Create(&test)
 	var tests []Test2
 	// SetDB.Create(&test) //create object -> insert
-	SetDB.Model(&test)
-	SetDB.Find(&tests) //select all
+	// db.Model(&test)
+	db.Find(&tests) //select all
 	fmt.Println(tests)
 
 }
