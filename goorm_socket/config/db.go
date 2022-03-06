@@ -8,6 +8,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
+	"goorm_socket/models"
 	"goorm_socket/utils"
 )
 
@@ -24,25 +25,27 @@ type Test2 struct {
 
 //각 서버에서 실행 시 디비 연결
 func ConnectDB() {
+	var err error
 	//사용자:비밀번호@tcp(ipAddress:port)
-	dsnGet := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		os.Getenv("DB_USER"), os.Getenv("DB_PASSWD"),
-		os.Getenv("GET_DB_HOST"), os.Getenv("GET_DB_PORT"),
-		os.Getenv("DB_NAME"))
-	GetDB, err := gorm.Open(mysql.Open(dsnGet), &gorm.Config{})
-	utils.IfErrorMakePanic(err, "can not connect Get DB")
-	fmt.Println(GetDB)
-
 	dsnSet := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		os.Getenv("DB_USER"), os.Getenv("DB_PASSWD"),
 		os.Getenv("SET_DB_HOST"), os.Getenv("SET_DB_PORT"),
 		os.Getenv("DB_NAME"))
-	SetDB, err := gorm.Open(mysql.Open(dsnSet), &gorm.Config{
+	SetDB, err = gorm.Open(mysql.Open(dsnSet), &gorm.Config{
 		// DisableForeignKeyConstraintWhenMigrating: true,
 	})
 	utils.IfErrorMakePanic(err, "can not connect Set DB")
-	migrateAllTable()
 	fmt.Println(SetDB)
+	migrateAllTable()
+
+	dsnGet := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		os.Getenv("DB_USER"), os.Getenv("DB_PASSWD"),
+		os.Getenv("GET_DB_HOST"), os.Getenv("GET_DB_PORT"),
+		os.Getenv("DB_NAME"))
+	GetDB, err = gorm.Open(mysql.Open(dsnGet), &gorm.Config{})
+	utils.IfErrorMakePanic(err, "can not connect Get DB")
+	fmt.Println(GetDB)
+
 	// fmt.Println(SetDB.AutoMigrate(Test2{}), "testetset!!😂")
 	// db := SetDB.AutoMigrate(Test2{})
 	// fmt.Println(db)
@@ -51,5 +54,9 @@ func ConnectDB() {
 
 //모든 model Migrate 함수
 func migrateAllTable() {
-	SetDB.AutoMigrate(&Test2{})
+	// SetDB.AutoMigrate(&Test2{})
+	fmt.Println(SetDB)
+	//delete column은 되지 않음 -> DropColumn이용
+	SetDB.AutoMigrate(&models.User{})
+	// SetDB.Migrator().DropColumn(&models.User{}, "profile_image2")
 }
