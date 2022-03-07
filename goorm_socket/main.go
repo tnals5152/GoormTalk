@@ -42,7 +42,10 @@ func main() {
 
 	http.Handle("/", http.FileServer(http.Dir("static")))
 	http.HandleFunc("/ws", socketHandler)
+	//웹소켓 포트 연결
 	log.Fatal(http.ListenAndServe(":"+os.Getenv("WEBSOCKET_PORT"), nil))
+
+	//웹 사이트(백엔드) 포트 연결
 
 }
 

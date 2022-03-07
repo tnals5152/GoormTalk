@@ -58,5 +58,24 @@ func migrateAllTable() {
 	fmt.Println(SetDB)
 	//delete column은 되지 않음 -> DropColumn이용
 	SetDB.AutoMigrate(&models.User{})
+	SetDB.AutoMigrate(&models.FriendsRelationship{})
+	// user := models.User{
+	// 	Username: "Genie@genie.com",
+	// 	Password: "Password",
+	// 	Name:     "Genie",
+	// }
+	// u := SetDB.Create(&user)
+	// fmt.Println(u)
+	// SetDB.Create(&models.FriendsRelationship{
+	// 	User: user,
+	// 	// Friend: user,
+	// })
+	var friends []models.FriendsRelationship
+	//FriendsRelationship 테이블과 User테이블 조인한 결과 테스트 코드
+	result := SetDB.Model(&models.FriendsRelationship{}).Joins("User").Find(&friends)
+	fmt.Println(&result, "❤")
+	fmt.Println(friends[5].User.Username, "🤢")
+	fmt.Println(friends[5].UserID, "🤢")
 	// SetDB.Migrator().DropColumn(&models.User{}, "profile_image2")
+
 }

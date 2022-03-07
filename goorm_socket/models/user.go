@@ -5,6 +5,7 @@ import "gorm.io/gorm"
 type User struct {
 	gorm.Model
 	Username     string `gorm:"column:username"`
+	Password     string `gorm:"column:password"`
 	Name         string `gorm:"column:name"`
 	ProfileImage string `gorm:"column:profile_image"`
 }
