@@ -56,6 +56,9 @@ func migrateAllTable() {
 	SetDB.AutoMigrate(&models.Room{})
 	SetDB.AutoMigrate(&models.RoomUsers{})
 	SetDB.AutoMigrate(&models.Message{})
+	SetDB.AutoMigrate(&models.File{})
+	SetDB.AutoMigrate(&models.Notice{})
+	SetDB.AutoMigrate(&models.Link{})
 
 	//FriendsRelationship 테이블과 User테이블 조인한 결과 테스트 코드
 	var friends []models.FriendsRelationship
