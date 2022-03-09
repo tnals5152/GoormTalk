@@ -46,36 +46,20 @@ func ConnectDB() {
 	utils.IfErrorMakePanic(err, "can not connect Get DB")
 	fmt.Println(GetDB)
 
-	// fmt.Println(SetDB.AutoMigrate(Test2{}), "testetset!!😂")
-	// db := SetDB.AutoMigrate(Test2{})
-	// fmt.Println(db)
-
 }
 
 //모든 model Migrate 함수
 func migrateAllTable() {
-	// SetDB.AutoMigrate(&Test2{})
-	fmt.Println(SetDB)
 	//delete column은 되지 않음 -> DropColumn이용
 	SetDB.AutoMigrate(&models.User{})
 	SetDB.AutoMigrate(&models.FriendsRelationship{})
-	// user := models.User{
-	// 	Username: "Genie@genie.com",
-	// 	Password: "Password",
-	// 	Name:     "Genie",
-	// }
-	// u := SetDB.Create(&user)
-	// fmt.Println(u)
-	// SetDB.Create(&models.FriendsRelationship{
-	// 	User: user,
-	// 	// Friend: user,
-	// })
-	var friends []models.FriendsRelationship
+	SetDB.AutoMigrate(&models.Room{})
+	SetDB.AutoMigrate(&models.RoomUsers{})
+	SetDB.AutoMigrate(&models.Message{})
+
 	//FriendsRelationship 테이블과 User테이블 조인한 결과 테스트 코드
+	var friends []models.FriendsRelationship
 	result := SetDB.Model(&models.FriendsRelationship{}).Joins("User").Find(&friends)
-	fmt.Println(&result, "❤")
-	fmt.Println(friends[5].User.Username, "🤢")
-	fmt.Println(friends[5].UserID, "🤢")
-	// SetDB.Migrator().DropColumn(&models.User{}, "profile_image2")
+	fmt.Println(result)
 
 }

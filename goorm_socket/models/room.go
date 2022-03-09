@@ -7,3 +7,7 @@ type Room struct {
 	RoomName string //room_name
 	RoomType uint
 }
+
+func (r Room) TableName() string {
+	return "Room"
+}
