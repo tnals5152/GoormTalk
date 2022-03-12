@@ -18,7 +18,9 @@ func TestCreateDB(t *testing.T) {
 	config.ConnectDB()
 	user1, user2 := createUser()
 	createFriendsRelationship(user1, user2)
-	createRoom(user2)
+	room := createRoom(user2)
+	createRoomUser(user1, room)
+	createRoomUser(user2, room)
 
 	fmt.Println("")
 }
@@ -51,7 +53,7 @@ func createFriendsRelationship(user1 *models.User, user2 *models.User) {
 	fmt.Println(*friend)
 }
 
-func createRoom(owner *models.User) {
+func createRoom(owner *models.User) *models.Room {
 	room := &models.Room{
 		RoomName: "soominWithgenie",
 		RoomType: 1,
@@ -59,6 +61,14 @@ func createRoom(owner *models.User) {
 	}
 
 	config.SetDB.Where(room).FirstOrCreate(room).Joins("User")
-	fmt.Println(*room)
+	return room
+}
 
+func createRoomUser(user *models.User, room *models.Room) {
+	roomUser := &models.RoomUser{
+		Room: *room,
+		User: *user,
+	}
+	config.SetDB.Where(roomUser).FirstOrCreate(roomUser).Joins("User", "Room")
+	fmt.Println("😂", roomUser)
 }
