@@ -1,8 +1,6 @@
 package models
 
 import (
-	"database/sql"
-
 	"gorm.io/gorm"
 )
 
@@ -16,15 +14,15 @@ var RoomTypeDomain RoomTypeDomainStruct = RoomTypeDomainStruct{
 	Group:    2,
 }
 
-type RoomUsers struct {
+type RoomUser struct {
 	gorm.Model
-	RoomName sql.NullString `gorm:"null"`
-	RoomType sql.NullInt16  `gorm:"null; default:1"`
-	Owner    User           `gorm:"foreignKey:UserID"`
-	UserID   uint
-	Notice   bool `gorm:"default:false"`
+	Room   Room `gorm:"foreignKey:RoomID"`
+	RoomID uint
+	User   User `gorm:"foreignKey:UserID"`
+	UserID uint
+	Notice bool `gorm:"default:false"`
 }
 
-func (ru RoomUsers) TableName() string {
-	return "RoomUsers"
+func (ru RoomUser) TableName() string {
+	return "RoomUser"
 }

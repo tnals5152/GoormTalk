@@ -54,7 +54,7 @@ func migrateAllTable() {
 	SetDB.AutoMigrate(&models.User{})
 	SetDB.AutoMigrate(&models.FriendsRelationship{})
 	SetDB.AutoMigrate(&models.Room{})
-	SetDB.AutoMigrate(&models.RoomUsers{})
+	SetDB.AutoMigrate(&models.RoomUser{})
 	SetDB.AutoMigrate(&models.Message{})
 	SetDB.AutoMigrate(&models.File{})
 	SetDB.AutoMigrate(&models.Notice{})
