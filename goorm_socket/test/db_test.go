@@ -25,6 +25,7 @@ func TestCreateDB(t *testing.T) {
 	fmt.Println("")
 }
 
+//select * from information_schema.table_constraints where table_name = '테이블명';
 func createUser() (*models.User, *models.User) {
 	user1 := models.User{
 		Username: "genie@genielove.com",
@@ -45,8 +46,10 @@ func createUser() (*models.User, *models.User) {
 func createFriendsRelationship(user1 *models.User, user2 *models.User) {
 	//tnals만 genie를 아는 사이
 	friend := &models.FriendsRelationship{
-		User:   *user2,
-		Friend: *user1,
+		// User:   *user2,
+		// Friend: *user1,
+		UserID:   user2.ID,
+		FriendID: user1.ID,
 	}
 
 	config.SetDB.Where(friend).FirstOrCreate(friend).Joins("User")
@@ -57,7 +60,7 @@ func createRoom(owner *models.User) *models.Room {
 	room := &models.Room{
 		RoomName: "soominWithgenie",
 		RoomType: 1,
-		Owner:    *owner,
+		UserID:   owner.ID,
 	}
 
 	config.SetDB.Where(room).FirstOrCreate(room).Joins("User")
@@ -66,9 +69,9 @@ func createRoom(owner *models.User) *models.Room {
 
 func createRoomUser(user *models.User, room *models.Room) {
 	roomUser := &models.RoomUser{
-		Room: *room,
-		User: *user,
+		RoomID: room.ID,
+		UserID: user.ID,
 	}
 	config.SetDB.Where(roomUser).FirstOrCreate(roomUser).Joins("User", "Room")
-	fmt.Println("😂", roomUser)
+	fmt.Println("😂", roomUser.Room)
 }
