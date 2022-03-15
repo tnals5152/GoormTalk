@@ -63,11 +63,11 @@ func createRoom(owner *models.User) *models.Room {
 		// RoomType: 1,
 		// UserID:   owner.ID,
 	}
-	var rooms []models.Room
-	// DB2, err := config.SetDB.DB
+	var users []models.User
+	//django orm과 다르게 정방향으로 접근 가능...
 	config.SetDB.Joins("User").Last(room)
-	config.SetDB.Model(room).Preload("User").Find(&rooms)
-	fmt.Println("🥶 ", rooms)
+	config.SetDB.Preload("Room", &models.Room{RoomName: "hiTest"}).Find(&users)
+	fmt.Println("🥶 ", users)
 	return room
 }
 
