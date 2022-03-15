@@ -8,6 +8,7 @@ type User struct {
 	Password     string `gorm:"column:password"` //sha512로 저장예정
 	Name         string `gorm:"column:name"`
 	ProfileImage string `gorm:"column:profile_image"`
+	Room         []Room
 }
 
 //테이블 이름 지정
