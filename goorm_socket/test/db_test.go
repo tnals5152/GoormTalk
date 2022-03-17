@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/joho/godotenv"
-	"gorm.io/gorm/clause"
 
 	"goorm_socket/config"
 	"goorm_socket/models"
@@ -19,9 +18,9 @@ func TestCreateDB(t *testing.T) {
 	config.ConnectDB()
 	user1, user2 := createUser()
 	createFriendsRelationship(user1, user2)
-	createRoom(user1)
-	// createRoomUser(user1, room)
-	// createRoomUser(user2, room)
+	room := createRoom(user1)
+	createRoomUser(user1, room)
+	createRoomUser(user2, room)
 
 	fmt.Println("")
 }
@@ -73,22 +72,15 @@ func createRoom(owner *models.User) *models.Room {
 
 func createRoomUser(user *models.User, room *models.Room) {
 	roomUser := &models.RoomUser{}
-	var roomUsers []models.RoomUser
-	// config.SetDB.Joins("User", "Room").Where(roomUser).FirstOrCreate(roomUser)
-	//claus.Associations = 연관된 모든 테이블 데이터 출력
-	config.SetDB.Preload(clause.Associations).Where(roomUser).FirstOrCreate(roomUser)
-	// config.SetDB.Joins("User", user).Joins("Room", room).Find(&roomUsers)//되는 것
-	// config.SetDB.Joins("inner join User on User.id = RoomUser.user_id and User.id=?", 11).Joins("Room", room).Find(&roomUsers)
-	// config.SetDB.Joins("User", user).Joins("Room", room).First(&roomUser)
-	// config.SetDB.Preload("User", user).Joins("User").FirstOrCreate(roomUser)
-	// config.SetDB.Model(user).Preload()
-	// config.SetDB.Joins("User", config.SetDB.Model(user).Where(user).First(user)).
-	// 	Joins("Room", config.SetDB.Model(room).Where(room)).First(roomUser)
-	config.SetDB.Preload(clause.Associations).Where(roomUser).Find(&roomUser)
+	var roomUsers []models.User
+	config.SetDB.Model(user).Association("RoomUser").Find(roomUser)
+	// config.SetDB.Preload("RoomUser.Room").Preload("RoomUser", &models.RoomUser{
+	// 	Room: *room, User: *user}).Last(&roomUser)
 	fmt.Println("😂", *user)
 	for _, r := range roomUsers {
-		fmt.Println("👿", r)
+		fmt.Println("👿", r.RoomUser, "!!!", r.Room)
 	}
 	fmt.Println("🤬", roomUser.Room)
 	fmt.Println("🤬", roomUser.User)
+	fmt.Println("🤬", roomUser)
 }
