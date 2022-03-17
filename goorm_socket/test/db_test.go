@@ -18,7 +18,7 @@ func TestCreateDB(t *testing.T) {
 	config.ConnectDB()
 	user1, user2 := createUser()
 	createFriendsRelationship(user1, user2)
-	room := createRoom(user1)
+	room := createRoom(user2)
 	createRoomUser(user1, room)
 	createRoomUser(user2, room)
 
@@ -58,29 +58,29 @@ func createFriendsRelationship(user1 *models.User, user2 *models.User) {
 
 func createRoom(owner *models.User) *models.Room {
 	room := &models.Room{
-		// RoomName: "hiTest",
-		// RoomType: 1,
-		// UserID:   owner.ID,
+		RoomName: "soominWithgenie",
+		RoomType: 1,
+		UserID:   owner.ID,
 	}
-	var users []models.User
-	//django orm과 다르게 정방향으로 접근 가능...
-	config.SetDB.Joins("User").Last(room)
-	config.SetDB.Preload("Room", &models.Room{RoomName: "hiTest"}).Find(&users)
-	fmt.Println("🥶 ", users)
+
+	config.SetDB.Where(room).FirstOrCreate(room)
+
+	// var users []models.User
+	// //django orm과 다르게 정방향으로 접근 가능...
+	// config.SetDB.Joins("User").Last(room)
+	// config.SetDB.Preload("Room", &models.Room{RoomName: "hiTest"}).Find(&users)
+	// fmt.Println("🥶 ", users)
 	return room
 }
 
 func createRoomUser(user *models.User, room *models.Room) {
-	roomUser := &models.RoomUser{}
-	var roomUsers []models.User
-	config.SetDB.Model(user).Association("RoomUser").Find(roomUser)
-	// config.SetDB.Preload("RoomUser.Room").Preload("RoomUser", &models.RoomUser{
-	// 	Room: *room, User: *user}).Last(&roomUser)
-	fmt.Println("😂", *user)
-	for _, r := range roomUsers {
-		fmt.Println("👿", r.RoomUser, "!!!", r.Room)
+	roomUser := &models.RoomUser{
+		RoomID: room.ID,
+		UserID: user.ID,
 	}
-	fmt.Println("🤬", roomUser.Room)
-	fmt.Println("🤬", roomUser.User)
-	fmt.Println("🤬", roomUser)
+	config.SetDB.Model(&models.RoomUser{}).
+		Preload("User").Preload("Room.Owner").Where(roomUser).FirstOrCreate(&roomUser)
+	//.Preload("Room", func(tx *gorm.DB) *gorm.DB {
+	// 	return tx.Preload("Owner")
+	// })
 }

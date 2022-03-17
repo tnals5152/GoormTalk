@@ -7,6 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 
 	"goorm_socket/models"
 	"goorm_socket/utils"
@@ -33,6 +34,7 @@ func ConnectDB() {
 		os.Getenv("DB_NAME"))
 	SetDB, err = gorm.Open(mysql.Open(dsnSet), &gorm.Config{
 		// DisableForeignKeyConstraintWhenMigrating: true,
+		Logger: logger.Default.LogMode(logger.Info),
 	})
 	utils.IfErrorMakePanic(err, "can not connect Set DB")
 	fmt.Println(SetDB)
