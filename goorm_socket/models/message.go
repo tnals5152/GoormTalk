@@ -5,9 +5,9 @@ import (
 )
 
 type MessageTypeDomainStruct struct {
-	Message int
-	File    int
-	Link    int
+	Message uint
+	File    uint
+	Link    uint
 }
 
 var MessageTypeDomain MessageTypeDomainStruct = MessageTypeDomainStruct{

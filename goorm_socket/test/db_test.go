@@ -21,8 +21,7 @@ func TestCreateDB(t *testing.T) {
 	room := createRoom(user2)
 	createRoomUser(user1, room)
 	createRoomUser(user2, room)
-
-	fmt.Println("")
+	createMessage(user2, room, "start Message!")
 }
 
 //select * from information_schema.table_constraints where table_name = '테이블명';
@@ -43,7 +42,7 @@ func createUser() (*models.User, *models.User) {
 
 }
 
-func createFriendsRelationship(user1 *models.User, user2 *models.User) {
+func createFriendsRelationship(user1 *models.User, user2 *models.User) *models.FriendsRelationship {
 	//tnals만 genie를 아는 사이
 	friend := &models.FriendsRelationship{
 		// User:   *user2,
@@ -52,8 +51,8 @@ func createFriendsRelationship(user1 *models.User, user2 *models.User) {
 		FriendID: user1.ID,
 	}
 
-	config.SetDB.Where(friend).FirstOrCreate(friend).Joins("User")
-	fmt.Println(*friend)
+	config.SetDB.Model(&models.FriendsRelationship{}).Preload("User").Preload("Friend").Where(friend).FirstOrCreate(friend)
+	return friend
 }
 
 func createRoom(owner *models.User) *models.Room {
@@ -83,4 +82,17 @@ func createRoomUser(user *models.User, room *models.Room) {
 	//.Preload("Room", func(tx *gorm.DB) *gorm.DB {
 	// 	return tx.Preload("Owner")
 	// })
+}
+
+func createMessage(sender *models.User, room *models.Room, content string) {
+	//메시지 작성 API 작성
+	message := &models.Message{
+		RoomID:      room.ID,
+		UserID:      sender.ID,
+		Content:     content,
+		MessageType: models.MessageTypeDomain.Message,
+	}
+	config.SetDB.Preload("Room").Preload("User").FirstOrCreate(message)
+	fmt.Println(message)
+	//메시지 소켓으로 전달(카프카)
 }
