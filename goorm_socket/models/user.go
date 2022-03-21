@@ -9,6 +9,7 @@ type User struct {
 	Name         string `gorm:"column:name"`
 	ProfileImage string `gorm:"column:profile_image"`
 	Room         []Room
+	RoomUser     []RoomUser
 }
 
 //테이블 이름 지정
