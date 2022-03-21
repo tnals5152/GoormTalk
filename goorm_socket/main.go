@@ -7,9 +7,11 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/joho/godotenv"
 
+	"goorm_socket/api"
 	"goorm_socket/config"
 	"goorm_socket/utils"
 )
@@ -40,13 +42,16 @@ func main() {
 	config.ConnectBroker()
 	defer producer.ChatProducer.Close()
 
+	r := gin.Default()
+
+	r.POST("/login", api.Login)
 	http.Handle("/", http.FileServer(http.Dir("static")))
 	http.HandleFunc("/ws", socketHandler)
 	//웹소켓 포트 연결
 	log.Fatal(http.ListenAndServe(":"+os.Getenv("WEBSOCKET_PORT"), nil))
 
 	//웹 사이트(백엔드) 포트 연결
-
+	//export PATH=$PATH:/usr/local/go/bin:$GOBIN
 }
 
 //url parameter -> r.URL.Query()
