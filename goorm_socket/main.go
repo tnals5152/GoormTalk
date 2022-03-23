@@ -33,6 +33,7 @@ type testJson struct {
 //w.send("message")로 테스트
 func main() {
 	err := godotenv.Load("../.env")
+	utils.ErrorCheck(err)
 	config.ConnectDB()
 	if !config.KafkaSetting() {
 		panic("kafka setting error")
@@ -45,6 +46,14 @@ func main() {
 	r := gin.Default()
 
 	r.POST("/login", api.Login)
+
+	r.GET("/ping", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
+	r.Run(":" + os.Getenv("WEB_PORT"))
+
 	http.Handle("/", http.FileServer(http.Dir("static")))
 	http.HandleFunc("/ws", socketHandler)
 	//웹소켓 포트 연결
