@@ -35,13 +35,13 @@ func main() {
 	err := godotenv.Load("../.env")
 	utils.ErrorCheck(err)
 	config.ConnectDB()
-	if !config.KafkaSetting() {
-		panic("kafka setting error")
-	}
-	utils.ErrorCheck(err)
-	producer := config.KafkaProduce() //produce는 서버당 하나 생성
-	config.ConnectBroker()
-	defer producer.ChatProducer.Close()
+	// if !config.KafkaSetting() {
+	// 	panic("kafka setting error")
+	// }
+	// utils.ErrorCheck(err)
+	// producer := config.KafkaProduce() //produce는 서버당 하나 생성
+	// config.ConnectBroker()
+	// defer producer.ChatProducer.Close()
 
 	r := gin.Default()
 
