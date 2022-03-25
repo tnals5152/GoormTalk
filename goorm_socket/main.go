@@ -34,6 +34,7 @@ type testJson struct {
 func main() {
 	err := godotenv.Load("../.env")
 	utils.ErrorCheck(err)
+	config.InitPath()
 	config.ConnectDB()
 	// if !config.KafkaSetting() {
 	// 	panic("kafka setting error")

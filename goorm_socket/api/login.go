@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
 
@@ -56,6 +55,12 @@ func Login(c *gin.Context) { //로그인 함수
 }
 
 func CreateUser(c *gin.Context) { //회원가입
+	/*data = {
+		"id": "tnals5152@gmail.com",
+		"password": "password",
+		"name": "지수민",
+		"profile": file or nil,
+	}*/
 	body := c.Request.Body
 	value, err := ioutil.ReadAll(body)
 	utils.ErrorCheck(err)
@@ -63,17 +68,26 @@ func CreateUser(c *gin.Context) { //회원가입
 	var user models.User
 	json.Unmarshal(value, &user)
 
-	profileImage, err = c.FormFile("profile_image")
+	profileImage, err := c.FormFile("profile_image")
 	utils.ErrorCheck(err)
+
 	if err == nil {
-		err = c.SaveUploadFile(profileImage, fmt.Sprintf("%s/profile_image/%s", os.Getenv("FILE_PATH")))
+		user.ProfileImage = fmt.Sprintf("%s/%s/%s",
+			config.Path.ProfileImage, user.Username, profileImage.Filename)
+		err = c.SaveUploadedFile(profileImage, user.ProfileImage)
+		utils.ErrorCheck(err)
 	}
 
-	/*data = {
-		"id": "tnals5152@gmail.com",
-		"password": "password",
-		"name": "지수민",
-		"profile": file or nil,
-	}*/
+	result := config.SetDB.Model(&user).Create(&user)
+
+	if result.Error != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"user": nil,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"user": user,
+		})
+	}
 
 }
