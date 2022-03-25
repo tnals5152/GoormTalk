@@ -3,8 +3,10 @@ package api
 import (
 	"crypto/sha512"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 
@@ -23,7 +25,7 @@ func Login(c *gin.Context) { //로그인 함수
 	json.Unmarshal(value, &data)
 	/*data = {
 		"id": "tnals5152@gmail.com",
-		"passwd": "password",
+		"password": "password",
 	}*/
 
 	// models.LoginCheck(data["id"].(string), data["password"].(string))
@@ -51,4 +53,27 @@ func Login(c *gin.Context) { //로그인 함수
 			"user": nil,
 		})
 	}
+}
+
+func CreateUser(c *gin.Context) { //회원가입
+	body := c.Request.Body
+	value, err := ioutil.ReadAll(body)
+	utils.ErrorCheck(err)
+
+	var user models.User
+	json.Unmarshal(value, &user)
+
+	profileImage, err = c.FormFile("profile_image")
+	utils.ErrorCheck(err)
+	if err == nil {
+		err = c.SaveUploadFile(profileImage, fmt.Sprintf("%s/profile_image/%s", os.Getenv("FILE_PATH")))
+	}
+
+	/*data = {
+		"id": "tnals5152@gmail.com",
+		"password": "password",
+		"name": "지수민",
+		"profile": file or nil,
+	}*/
+
 }
