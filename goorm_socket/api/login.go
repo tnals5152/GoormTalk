@@ -14,7 +14,8 @@ import (
 	"goorm_socket/utils"
 )
 
-//curl -d '{"id":"soomin@genielove.com", "passwd":"passsword"}' -X POST localhost:8000/login
+//curl -d '{"id":"soomin@genielove.com", "password":"passsword"}' -X POST localhost:8000/api/v1/login
+// Welcom godoc
 func Login(c *gin.Context) { //로그인 함수
 	body := c.Request.Body
 	value, err := ioutil.ReadAll(body)
@@ -28,7 +29,7 @@ func Login(c *gin.Context) { //로그인 함수
 	}*/
 
 	// models.LoginCheck(data["id"].(string), data["password"].(string))
-	password := sha512.Sum512([]byte(data["passwd"].(string)))
+	password := sha512.Sum512([]byte(data["password"].(string)))
 
 	var users []models.User
 	user := &models.User{

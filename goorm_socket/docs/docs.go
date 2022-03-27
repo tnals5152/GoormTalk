@@ -15,7 +15,89 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {}
+    "paths": {
+        "/api/v1/login": {
+            "post": {
+                "description": "login정보 상세 설명",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "login정보 요약",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User password",
+                        "name": "password",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "response": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Fail"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "main.User": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "user id",
+                    "type": "string",
+                    "example": "tnals5152"
+                },
+                "created_at": {
+                    "description": "user create time",
+                    "type": "time",
+                    "example": "2022-02-28 10:20:03"
+                },
+                "updated_at": {
+                    "description": "user update time",
+                    "type": "time",
+                    "example": "2022-02-28 10:20:03"
+                },
+                "deleted_at": {
+                    "description": "user delete time",
+                    "type": "time",
+                    "example": "2022-02-28 10:20:03"
+                },
+                "username": {
+                    "description": "user email",
+                    "type": "string",
+                    "example": "tnals5152@gmail.com"
+                },
+                "name": {
+                    "description": "user name",
+                    "type": "string",
+                    "example": "지니맘"
+                },
+                "profile_image": {
+                    "description": "user profile image path",
+                    "type": "string",
+                    "example": "file_storage/profile_image/tnals5152@gmail.com/file_name"
+                }
+            }
+        }
+    }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it

@@ -34,6 +34,18 @@ type testJson struct {
 
 //javascript console에서 w = new WebSocket("ws://15.164.220.65:8080/ws") 시 실행
 //w.send("message")로 테스트
+// @title Swagger Example API
+// @version 1.0
+// @description This is a sample server Petstore server.
+// @termsOfService http://swagger.io/terms/
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @host petstore.swagger.io
+// @BasePath /v2
+
 func main() {
 	err := godotenv.Load("../.env")
 	utils.ErrorCheck(err)
@@ -52,7 +64,9 @@ func main() {
 	// defer producer.ChatProducer.Close()
 
 	r := gin.Default()
-	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler,
+		ginSwagger.URL("http://3.39.24.154:8000/swagger/doc.json"),
+		ginSwagger.DefaultModelsExpandDepth(-1)))
 
 	v1Group := r.Group("/api/v1")
 	{
