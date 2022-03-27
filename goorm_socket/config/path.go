@@ -1,10 +1,5 @@
 package config
 
-import (
-	"fmt"
-	"os"
-)
-
 type PathStruct struct {
 	ProfileImage string
 }
@@ -12,5 +7,5 @@ type PathStruct struct {
 var Path *PathStruct
 
 func InitPath() {
-	Path.ProfileImage = fmt.Sprintf("%s/profile_image", os.Getenv("FILE_PATH"))
+	// Path.ProfileImage = fmt.Sprintf("%s/profile_image", os.Getenv("FILE_PATH"))
 }

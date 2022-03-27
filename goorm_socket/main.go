@@ -10,9 +10,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/joho/godotenv"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"goorm_socket/api"
 	"goorm_socket/config"
+	"goorm_socket/docs"
 	"goorm_socket/utils"
 )
 
@@ -34,6 +37,10 @@ type testJson struct {
 func main() {
 	err := godotenv.Load("../.env")
 	utils.ErrorCheck(err)
+
+	docs.SwaggerInfo.Title = "Swagger API"
+	// r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	config.InitPath()
 	config.ConnectDB()
 	// if !config.KafkaSetting() {
@@ -45,8 +52,12 @@ func main() {
 	// defer producer.ChatProducer.Close()
 
 	r := gin.Default()
+	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	r.POST("/login", api.Login)
+	v1Group := r.Group("/api/v1")
+	{
+		v1Group.POST("/login", api.Login)
+	}
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
