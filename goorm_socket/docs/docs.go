@@ -10,90 +10,192 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "url": "http://www.swagger.io/support",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/login": {
+        "/login": {
             "post": {
-                "description": "login정보 상세 설명",
+                "description": "If it already exists, the changeable information is updated, and in the case of a new host, it is created and returned.",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "login정보 요약",
+                "summary": "Host information collection.",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "User id",
+                        "description": "User ID",
                         "name": "id",
-                        "in": "path",
-                        "required": true
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     },
                     {
-                        "type": "string",
                         "description": "User password",
                         "name": "password",
-                        "in": "path",
-                        "required": true
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
-                "response": {
+                "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.User"
+                            "$ref": "#/definitions/models.User"
                         }
                     },
                     "400": {
-                        "description": "Fail"
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
                     }
                 }
             }
         }
     },
     "definitions": {
-        "main.User": {
+        "gorm.DeletedAt": {
             "type": "object",
             "properties": {
+                "time": {
+                    "type": "string"
+                },
+                "valid": {
+                    "description": "Valid is true if Time is not NULL",
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.Room": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
                 "id": {
-                    "description": "user id",
-                    "type": "string",
-                    "example": "tnals5152"
+                    "type": "integer"
                 },
-                "created_at": {
-                    "description": "user create time",
-                    "type": "time",
-                    "example": "2022-02-28 10:20:03"
+                "owner": {
+                    "$ref": "#/definitions/models.User"
                 },
-                "updated_at": {
-                    "description": "user update time",
-                    "type": "time",
-                    "example": "2022-02-28 10:20:03"
+                "roomName": {
+                    "description": "room_name",
+                    "type": "string"
                 },
-                "deleted_at": {
-                    "description": "user delete time",
-                    "type": "time",
-                    "example": "2022-02-28 10:20:03"
+                "roomType": {
+                    "type": "integer"
                 },
-                "username": {
-                    "description": "user email",
-                    "type": "string",
-                    "example": "tnals5152@gmail.com"
+                "updatedAt": {
+                    "type": "string"
+                },
+                "userID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.RoomUser": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "notice": {
+                    "type": "boolean"
+                },
+                "room": {
+                    "$ref": "#/definitions/models.Room"
+                },
+                "roomID": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "user": {
+                    "description": "` + "`" + `gorm:\"foreignKey:UserID\"` + "`" + `",
+                    "$ref": "#/definitions/models.User"
+                },
+                "userID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.User": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "integer"
                 },
                 "name": {
-                    "description": "user name",
-                    "type": "string",
-                    "example": "지니맘"
+                    "type": "string"
                 },
-                "profile_image": {
-                    "description": "user profile image path",
-                    "type": "string",
-                    "example": "file_storage/profile_image/tnals5152@gmail.com/file_name"
+                "profileImage": {
+                    "type": "string"
+                },
+                "room": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Room"
+                    }
+                },
+                "roomUser": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.RoomUser"
+                    }
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "username": {
+                    "description": "default string length = varchar(255)",
+                    "type": "string"
                 }
             }
         }
@@ -102,12 +204,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
-	BasePath:         "",
+	Version:          "1.0",
+	Host:             "3.39.24.154:8000",
+	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "Swagger Example API",
+	Description:      "This is a sample server Petstore server.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }

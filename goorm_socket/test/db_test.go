@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/sha512"
 	"fmt"
 	"os"
 	"testing"
@@ -26,14 +27,15 @@ func TestCreateDB(t *testing.T) {
 
 //select * from information_schema.table_constraints where table_name = '테이블명';
 func createUser() (*models.User, *models.User) {
+	password := sha512.Sum512([]byte("password"))
 	user1 := models.User{
 		Username: "genie@genielove.com",
-		Password: "password",
+		Password: string(password[:]),
 		Name:     "지니",
 	}
 	user2 := models.User{
 		Username: "soomin@genielove.com",
-		Password: "password",
+		Password: string(password[:]),
 		Name:     "tnals",
 	}
 	config.SetDB.Where(&user1).FirstOrCreate(&user1)

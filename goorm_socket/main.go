@@ -43,9 +43,8 @@ type testJson struct {
 // @contact.email support@swagger.io
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-// @host petstore.swagger.io
-// @BasePath /v2
-
+// @host 3.39.24.154:8000
+// @BasePath /api/v1
 func main() {
 	err := godotenv.Load("../.env")
 	utils.ErrorCheck(err)
