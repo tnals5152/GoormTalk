@@ -70,6 +70,7 @@ func main() {
 	v1Group := r.Group("/api/v1")
 	{
 		v1Group.POST("/login", api.Login)
+		v1Group.POST("/create-user", api.CreateUser)
 	}
 
 	r.GET("/ping", func(c *gin.Context) {

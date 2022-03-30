@@ -14,13 +14,17 @@ import (
 	"goorm_socket/utils"
 )
 
-//curl -d '{"id":"soomin@genielove.com", "password":"passsword"}' -X POST localhost:8000/api/v1/login
-// CollectHost godoc
-// @Summary Host information collection.
-// @Description If it already exists, the changeable information is updated, and in the case of a new host, it is created and returned.
+type loginUser struct {
+	Username string `json:"username" example:"soomin@genielove.com"`
+	Password string `json:"password" example:"passsword"`
+}
+
+//curl -d '{"username":"soomin@genielove.com", "password":"passsword"}' -X POST localhost:8000/api/v1/login
+// @Summary login api
+// @Description user login
 // @Accept json
 // @Produce json
-// @Param user body RequestData true "User ID and password"
+// @Param user body loginUser true "User username and password"
 // @Success 200 {object} models.User
 // @Failure 400 {object} models.User
 // @Failure 404 {object} models.User
@@ -31,20 +35,14 @@ func Login(c *gin.Context) { //로그인 함수
 	value, err := ioutil.ReadAll(body)
 	utils.ErrorCheck(err)
 
-	var data map[string]interface{}
+	// var data map[string]interface{}
+	var data loginUser
 	json.Unmarshal(value, &data)
-	fmt.Println("😊", data)
-	/*data = {
-		"id": "tnals5152@gmail.com",
-		"password": "password",
-	}*/
-
-	// models.LoginCheck(data["id"].(string), data["password"].(string))
-	password := sha512.Sum512([]byte(data["password"].(string)))
+	password := sha512.Sum512([]byte(data.Password))
 
 	var users []models.User
 	user := &models.User{
-		Username: data["id"].(string),
+		Username: data.Username,
 		Password: string(password[:]),
 	}
 
@@ -57,22 +55,32 @@ func Login(c *gin.Context) { //로그인 함수
 	// config.SetDB.Save(user)
 	//result.RowsAffected - result개수
 	result := config.GetDB.Model(user).Where(user).Find(&users)
-	fmt.Println("😀", users)
 
 	if result.RowsAffected == 1 { //일치하는 유저 있음 1개 -> 로그인 성공
 		c.JSON(http.StatusOK, gin.H{
 			"user": users[0],
 		})
 	} else {
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusNotFound, gin.H{
 			"user": nil,
 		})
 	}
 }
 
+// @Summary create user
+// @Description create user
+// @Accept mpfd
+// @Produce mpfd
+// @Param user body models.User true "User username(email), password, name"
+// @Param profile_image formData file true "User profile"
+// @Success 200 {object} models.User
+// @Failure 400 {object} models.User
+// @Failure 404 {object} models.User
+// @Failure 500 {object} models.User
+// @Router /create-user [post]
 func CreateUser(c *gin.Context) { //회원가입
 	/*data = {
-		"id": "tnals5152@gmail.com",
+		"username": "tnals5152@gmail.com",
 		"password": "password",
 		"name": "지수민",
 		"profile": file or nil,
@@ -85,6 +93,7 @@ func CreateUser(c *gin.Context) { //회원가입
 	json.Unmarshal(value, &user)
 
 	profileImage, err := c.FormFile("profile_image")
+	fmt.Println(profileImage, user)
 	utils.ErrorCheck(err)
 
 	if err == nil {
