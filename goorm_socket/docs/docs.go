@@ -25,33 +25,80 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/create-user": {
+            "post": {
+                "description": "create user and",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "multipart/form-data"
+                ],
+                "summary": "create user",
+                "parameters": [
+                    {
+                        "description": "User username(email), password, name",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    },
+                    {
+                        "type": "file",
+                        "description": "User profile",
+                        "name": "profile_image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
-                "description": "If it already exists, the changeable information is updated, and in the case of a new host, it is created and returned.",
+                "description": "user login",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Host information collection.",
+                "summary": "login api",
                 "parameters": [
                     {
-                        "description": "User ID",
-                        "name": "id",
+                        "description": "User username and password",
+                        "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "User password",
-                        "name": "password",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/api.loginUser"
                         }
                     }
                 ],
@@ -85,6 +132,19 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "api.loginUser": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "example": "passsword"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "soomin@genielove.com"
+                }
+            }
+        },
         "gorm.DeletedAt": {
             "type": "object",
             "properties": {

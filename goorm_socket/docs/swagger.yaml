@@ -1,5 +1,14 @@
 basePath: /api/v1
 definitions:
+  api.loginUser:
+    properties:
+      password:
+        example: passsword
+        type: string
+      username:
+        example: soomin@genielove.com
+        type: string
+    type: object
   gorm.DeletedAt:
     properties:
       time:
@@ -90,25 +99,55 @@ info:
   title: Swagger Example API
   version: "1.0"
 paths:
+  /create-user:
+    post:
+      consumes:
+      - multipart/form-data
+      description: create user and
+      parameters:
+      - description: User username(email), password, name
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      - description: User profile
+        in: formData
+        name: profile_image
+        required: true
+        type: file
+      produces:
+      - multipart/form-data
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.User'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.User'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.User'
+      summary: create user
   /login:
     post:
       consumes:
       - application/json
-      description: If it already exists, the changeable information is updated, and
-        in the case of a new host, it is created and returned.
+      description: user login
       parameters:
-      - description: User ID
+      - description: User username and password
         in: body
-        name: id
+        name: user
         required: true
         schema:
-          type: string
-      - description: User password
-        in: body
-        name: password
-        required: true
-        schema:
-          type: string
+          $ref: '#/definitions/api.loginUser'
       produces:
       - application/json
       responses:
@@ -128,5 +167,5 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.User'
-      summary: Host information collection.
+      summary: login api
 swagger: "2.0"
