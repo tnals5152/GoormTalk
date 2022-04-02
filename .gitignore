@@ -16,3 +16,4 @@ vendor/
 go.mod
 go.sum
 .env
+file_storage/
