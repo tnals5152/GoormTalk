@@ -103,21 +103,20 @@ paths:
     post:
       consumes:
       - multipart/form-data
-      description: create user and
+      description: create user
       parameters:
-      - description: User username(email), password, name
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/models.User'
       - description: User profile
         in: formData
-        name: profile_image
+        name: profileimage
         required: true
         type: file
+      - description: User profile
+        in: formData
+        name: i
+        required: true
+        type: string
       produces:
-      - multipart/form-data
+      - application/json
       responses:
         "200":
           description: OK

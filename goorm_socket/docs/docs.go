@@ -27,28 +27,26 @@ const docTemplate = `{
     "paths": {
         "/create-user": {
             "post": {
-                "description": "create user and",
+                "description": "create user",
                 "consumes": [
                     "multipart/form-data"
                 ],
                 "produces": [
-                    "multipart/form-data"
+                    "application/json"
                 ],
                 "summary": "create user",
                 "parameters": [
                     {
-                        "description": "User username(email), password, name",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.User"
-                        }
-                    },
-                    {
                         "type": "file",
                         "description": "User profile",
-                        "name": "profile_image",
+                        "name": "profileimage",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User profile",
+                        "name": "i",
                         "in": "formData",
                         "required": true
                     }

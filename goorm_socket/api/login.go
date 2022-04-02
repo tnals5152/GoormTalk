@@ -3,7 +3,6 @@ package api
 import (
 	"crypto/sha512"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -69,9 +68,11 @@ func Login(c *gin.Context) { //로그인 함수
 
 // @Summary create user
 // @Description create user
-// @Accept mpfd
-// @Produce mpfd
-// @Param user body models.User true "User username(email), password, name"
+// @Accept  multipart/form-data
+// @Produce  json
+// @Param username formData string true "User email"
+// @Param password formData string true "User password"
+// @Param name formData string true "User name"
 // @Param profile_image formData file true "User profile"
 // @Success 200 {object} models.User
 // @Failure 400 {object} models.User
@@ -79,40 +80,45 @@ func Login(c *gin.Context) { //로그인 함수
 // @Failure 500 {object} models.User
 // @Router /create-user [post]
 func CreateUser(c *gin.Context) { //회원가입
-	/*data = {
+	/*
 		"username": "tnals5152@gmail.com",
 		"password": "password",
 		"name": "지수민",
 		"profile": file or nil,
-	}*/
-	body := c.Request.Body
-	value, err := ioutil.ReadAll(body)
-	utils.ErrorCheck(err)
-
+	*/
 	var user models.User
-	json.Unmarshal(value, &user)
-
-	profileImage, err := c.FormFile("profile_image")
-	fmt.Println(profileImage, user)
+	err := c.ShouldBind(&user)
 	utils.ErrorCheck(err)
+	user.CheckIsUnique()
 
-	if err == nil {
-		user.ProfileImage = fmt.Sprintf("%s/%s/%s",
-			config.Path.ProfileImage, user.Username, profileImage.Filename)
-		err = c.SaveUploadedFile(profileImage, user.ProfileImage)
-		utils.ErrorCheck(err)
-	}
+	// profileImage, err := c.FormFile("profile_image")
+	// fmt.Println(profileImage, err)
+	// i := c.PostForm("i")
+	// fmt.Println(i)
+	// utils.ErrorCheck(err)
+	// c2, err := c.MultipartForm()
+	// fmt.Println(err)
+	// fmt.Println(c2)
+	// utils.ErrorCheck(err)
+	// fmt.Println(user)
 
-	result := config.SetDB.Model(&user).Create(&user)
+	// if err == nil {
+	// 	user.ProfileImage = fmt.Sprintf("%s/%s/%s",
+	// 		config.Path.ProfileImage, user.Username, profileImage.Filename)
+	// 	err = c.SaveUploadedFile(profileImage, user.ProfileImage)
+	// 	utils.ErrorCheck(err)
+	// }
 
-	if result.Error != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"user": nil,
-		})
-	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"user": user,
-		})
-	}
+	// result := config.SetDB.Model(&user).Create(&user)
+
+	// if result.Error != nil {
+	// 	c.JSON(http.StatusOK, gin.H{
+	// 		"user": nil,
+	// 	})
+	// } else {
+	// 	c.JSON(http.StatusOK, gin.H{
+	// 		"user": user,
+	// 	})
+	// }
 
 }
