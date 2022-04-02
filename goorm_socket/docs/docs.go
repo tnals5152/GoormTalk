@@ -58,9 +58,9 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "file",
+                        "type": "string",
                         "description": "User profile",
-                        "name": "profile_image",
+                        "name": "i",
                         "in": "formData",
                         "required": true
                     }
