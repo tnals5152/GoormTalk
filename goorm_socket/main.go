@@ -43,7 +43,7 @@ type testJson struct {
 // @contact.email support@swagger.io
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-// @host 3.39.24.154:8000
+// @host 15.165.160.93:8000
 // @BasePath /api/v1
 func main() {
 	err := godotenv.Load("../.env")
@@ -64,13 +64,13 @@ func main() {
 
 	r := gin.Default()
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler,
-		ginSwagger.URL("http://3.39.24.154:8000/swagger/doc.json"),
+		ginSwagger.URL("http://15.165.160.93:8000/swagger/doc.json"),
 		ginSwagger.DefaultModelsExpandDepth(-1)))
 
 	v1Group := r.Group("/api/v1")
 	{
 		v1Group.POST("/login", api.Login)
-		v1Group.POST("/create-user", api.CreateUser)
+		v1Group.POST("/create-user", api.CreateUserAPI)
 	}
 
 	r.GET("/ping", func(c *gin.Context) {

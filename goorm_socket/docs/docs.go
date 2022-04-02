@@ -27,23 +27,35 @@ const docTemplate = `{
     "paths": {
         "/create-user": {
             "post": {
-                "description": "create user and",
+                "description": "create user",
                 "consumes": [
                     "multipart/form-data"
                 ],
                 "produces": [
-                    "multipart/form-data"
+                    "application/json"
                 ],
                 "summary": "create user",
                 "parameters": [
                     {
-                        "description": "User username(email), password, name",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.User"
-                        }
+                        "type": "string",
+                        "description": "User email",
+                        "name": "username",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User password",
+                        "name": "password",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User name",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "type": "file",
@@ -222,6 +234,9 @@ const docTemplate = `{
         },
         "models.User": {
             "type": "object",
+            "required": [
+                "username"
+            ],
             "properties": {
                 "createdAt": {
                     "type": "string"
@@ -233,6 +248,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "name": {
+                    "description": "form - ShouldBind에서 쓰기 위한 것",
                     "type": "string"
                 },
                 "profileImage": {
@@ -265,7 +281,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "3.39.24.154:8000",
+	Host:             "15.165.160.93:8000",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "Swagger Example API",

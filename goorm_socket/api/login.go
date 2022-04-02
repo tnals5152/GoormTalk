@@ -62,48 +62,69 @@ func Login(c *gin.Context) { //로그인 함수
 		})
 	} else {
 		c.JSON(http.StatusNotFound, gin.H{
-			"user": nil,
+			"error":   "user",
+			"message": "can't find user",
 		})
 	}
 }
 
 // @Summary create user
 // @Description create user
-// @Accept mpfd
-// @Produce mpfd
-// @Param user body models.User true "User username(email), password, name"
+// @Accept  multipart/form-data
+// @Produce  json
+// @Param username formData string true "User email"
+// @Param password formData string true "User password"
+// @Param name formData string true "User name"
 // @Param profile_image formData file true "User profile"
 // @Success 200 {object} models.User
 // @Failure 400 {object} models.User
 // @Failure 404 {object} models.User
 // @Failure 500 {object} models.User
 // @Router /create-user [post]
-func CreateUser(c *gin.Context) { //회원가입
-	/*data = {
+func CreateUserAPI(c *gin.Context) { //회원가입
+	/*
 		"username": "tnals5152@gmail.com",
 		"password": "password",
 		"name": "지수민",
 		"profile": file or nil,
-	}*/
-	body := c.Request.Body
-	value, err := ioutil.ReadAll(body)
-	utils.ErrorCheck(err)
-
+	*/
 	var user models.User
-	json.Unmarshal(value, &user)
+	err := c.ShouldBind(&user)
+	utils.ErrorCheck(err)
+	if !user.CheckIsUnique() {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error":   "user",
+			"message": "username is not unique",
+		})
+		return
+	}
+
+	if !PasswordLegnth(user.Password) {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error":   "user",
+			"message": "password is too short",
+		})
+		return
+	}
 
 	profileImage, err := c.FormFile("profile_image")
-	fmt.Println(profileImage, user)
-	utils.ErrorCheck(err)
 
 	if err == nil {
+		//mkdirall 할 것
 		user.ProfileImage = fmt.Sprintf("%s/%s/%s",
 			config.Path.ProfileImage, user.Username, profileImage.Filename)
 		err = c.SaveUploadedFile(profileImage, user.ProfileImage)
 		utils.ErrorCheck(err)
 	}
+	result := user.CreateUser()
 
-	result := config.SetDB.Model(&user).Create(&user)
+	// // c2, err := c.MultipartForm()
+	// // fmt.Println(err)
+	// // fmt.Println(c2)
+	// // utils.ErrorCheck(err)
+	// // fmt.Println(user)
+
+	// result := config.SetDB.Model(&user).Create(&user)
 
 	if result.Error != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -115,4 +136,11 @@ func CreateUser(c *gin.Context) { //회원가입
 		})
 	}
 
+}
+
+func PasswordLegnth(password string) bool {
+	if len(password) < models.PasswordLength {
+		return false
+	}
+	return true
 }

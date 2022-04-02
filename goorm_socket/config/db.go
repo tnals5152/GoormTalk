@@ -9,7 +9,6 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
-	"goorm_socket/models"
 	"goorm_socket/utils"
 )
 
@@ -38,7 +37,6 @@ func ConnectDB() {
 	})
 	utils.IfErrorMakePanic(err, "can not connect Set DB")
 	fmt.Println(SetDB)
-	migrateAllTable()
 
 	dsnGet := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		os.Getenv("DB_USER"), os.Getenv("DB_PASSWD"),
@@ -47,24 +45,5 @@ func ConnectDB() {
 	GetDB, err = gorm.Open(mysql.Open(dsnGet), &gorm.Config{})
 	utils.IfErrorMakePanic(err, "can not connect Get DB")
 	fmt.Println(GetDB)
-
-}
-
-//모든 model Migrate 함수
-func migrateAllTable() {
-	//delete column은 되지 않음 -> DropColumn이용
-	SetDB.AutoMigrate(&models.User{})
-	SetDB.AutoMigrate(&models.FriendsRelationship{})
-	SetDB.AutoMigrate(&models.Room{})
-	SetDB.AutoMigrate(&models.RoomUser{})
-	SetDB.AutoMigrate(&models.Message{})
-	SetDB.AutoMigrate(&models.File{})
-	SetDB.AutoMigrate(&models.Notice{})
-	SetDB.AutoMigrate(&models.Link{})
-
-	//FriendsRelationship 테이블과 User테이블 조인한 결과 테스트 코드
-	var friends []models.FriendsRelationship
-	result := SetDB.Model(&models.FriendsRelationship{}).Joins("User").Find(&friends)
-	fmt.Println(result)
 
 }

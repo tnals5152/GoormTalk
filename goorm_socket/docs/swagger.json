@@ -15,28 +15,40 @@
         },
         "version": "1.0"
     },
-    "host": "3.39.24.154:8000",
+    "host": "15.165.160.93:8000",
     "basePath": "/api/v1",
     "paths": {
         "/create-user": {
             "post": {
-                "description": "create user and",
+                "description": "create user",
                 "consumes": [
                     "multipart/form-data"
                 ],
                 "produces": [
-                    "multipart/form-data"
+                    "application/json"
                 ],
                 "summary": "create user",
                 "parameters": [
                     {
-                        "description": "User username(email), password, name",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.User"
-                        }
+                        "type": "string",
+                        "description": "User email",
+                        "name": "username",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User password",
+                        "name": "password",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User name",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "type": "file",
@@ -215,6 +227,9 @@
         },
         "models.User": {
             "type": "object",
+            "required": [
+                "username"
+            ],
             "properties": {
                 "createdAt": {
                     "type": "string"
@@ -226,6 +241,7 @@
                     "type": "integer"
                 },
                 "name": {
+                    "description": "form - ShouldBind에서 쓰기 위한 것",
                     "type": "string"
                 },
                 "profileImage": {
