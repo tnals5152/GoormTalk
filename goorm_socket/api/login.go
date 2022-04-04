@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 
@@ -110,9 +111,12 @@ func CreateUserAPI(c *gin.Context) { //회원가입
 	profileImage, err := c.FormFile("profile_image")
 
 	if err == nil {
-		//mkdirall 할 것
-		user.ProfileImage = fmt.Sprintf("%s/%s/%s",
-			config.Path.ProfileImage, user.Username, profileImage.Filename)
+		filePath := fmt.Sprintf("%s/%s", config.Path.ProfileImage, user.Username)
+		user.ProfileImage = fmt.Sprintf("%s/%s", filePath, profileImage.Filename)
+		if _, err := os.Stat(filePath); os.IsNotExist(err) {
+			err = os.MkdirAll(user.ProfileImage, 0775)
+			utils.ErrorCheck(err)
+		}
 		err = c.SaveUploadedFile(profileImage, user.ProfileImage)
 		utils.ErrorCheck(err)
 	}

@@ -125,14 +125,9 @@ paths:
         type: string
       - description: User profile
         in: formData
-        name: profileimage
+        name: profile_image
         required: true
         type: file
-      - description: User profile
-        in: formData
-        name: i
-        required: true
-        type: string
       produces:
       - application/json
       responses:
